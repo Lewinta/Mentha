@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include mentha *.css
+recursive-include mentha *.csv
+recursive-include mentha *.html
+recursive-include mentha *.ico
+recursive-include mentha *.js
+recursive-include mentha *.json
+recursive-include mentha *.md
+recursive-include mentha *.png
+recursive-include mentha *.py
+recursive-include mentha *.svg
+recursive-include mentha *.txt
+recursive-exclude mentha *.pyc
