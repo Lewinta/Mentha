@@ -1,6 +1,6 @@
 frappe.ui.form.on("Purchase Invoice", {
 	onload_post_render: frm => {
-		// frm.trigger("check_order_type");
+		frm.trigger("check_order_type");
 	},
 	check_order_type: frm => {
 		if (!frm.doc.items)
