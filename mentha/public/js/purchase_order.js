@@ -2,15 +2,14 @@ frappe.ui.form.on("Purchase Order", {
 	refresh: frm => {
 	},
 	order_type: frm => {
-		let {order_type} = frm.doc;
-		let cond = eval(order_type == "TEL VAYDA");
-		if (!order_type)
+		if (!frm.doc.order_type)
 			return
 		//Let's set read only the following fields [rate, amount]
 		frappe.run_serially([
 			() => frm.clear_table("items"),
 			() => frm.add_child("items", {}),
-			() => frm.fields_dict.items.grid.fields_map.rate.read_only = cond,
+			() => frappe.timeout(1),
+			() => frm.fields_dict.items.grid.fields_map.rate.read_only = eval(frm.doc.order_type == "TEL VAYDA"),
 			() => frm.refresh_field("items"),
 		]);
 	}
