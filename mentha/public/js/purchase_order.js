@@ -1,9 +1,8 @@
 frappe.ui.form.on("Purchase Order", {
 	refresh: frm => {
-
 	},
 	order_type: frm => {
-		const {order_type} = frm.doc;
+		let {order_type} = frm.doc;
 		let cond = eval(order_type == "TEL VAYDA");
 		if (!order_type)
 			return

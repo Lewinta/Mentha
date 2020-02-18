@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import flt
+import json
 
 def on_submit(doc, event):
 	update_po_qty_billed(doc, event)
@@ -24,9 +25,11 @@ def update_row_qty_billed(row):
 			`tabPurchase Invoice Item`.docstatus = 1
 		AND
 			`tabPurchase Invoice Item`.item_code = %s
+		AND
+			`tabPurchase Invoice Item`.po_detail = %s
 		GROUP BY
 			`tabPurchase Invoice Item`.purchase_order
-	""", row.item_code, debug=False, as_list=True)
+	""", (row.item_code, row.po_detail), debug=False, as_list=True)
 	
 	stock_qty = poi[0][0] if poi else 0
 	
@@ -53,5 +56,30 @@ def update_row_qty_billed(row):
 	per_qty_billed = flt(billed_qty) / flt(stock_qty) * 100
 	frappe.db.set_value("Purchase Order", row.purchase_order, "qty_billed", billed_qty)
 	frappe.db.set_value("Purchase Order", row.purchase_order, "per_qty_billed", flt(per_qty_billed, 2))
+
+@frappe.whitelist()
+def get_po_info(items):
+	if type(items) == unicode:
+		items = json.loads(
+			items.replace("u'", "'").replace("'", "\"")
+		)
+	for item in items:
+		if not item.get("purchase_order"):
+			continue
+
+		po_type = frappe.db.get_value(
+			"Purchase Order",
+			item.get("purchase_order"),
+			"order_type"
+		)
+
+		if po_type == "TEL VAYDA":
+			item.update({
+				"rate": .000,
+				"amount": .000
+			})
+	return items
+
+
 
 
