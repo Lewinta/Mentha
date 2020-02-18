@@ -1,4 +1,16 @@
 frappe.ui.form.on("Purchase Invoice", {
+	validate: frm => {
+		frm.trigger("validate_rates");
+	},
+	validate_rates: frm => {
+		$.map(frm.doc.items, item => {
+			if (item.rate == 0.00){
+				frappe.throw("Rate on line " + item.idx + " must be greather than 0!");
+				validated = false;
+			}
+		});
+			
+	},
 	onload_post_render: frm => {
 		frm.trigger("check_order_type");
 	},
