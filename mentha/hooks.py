@@ -52,6 +52,15 @@ fixtures = [
 				)
 			)
 		}
+	},{
+		"doctype": "Print Format",
+		"filters": {
+			"name": (
+				"in", (
+					"Purchase Summary",
+				)
+			)
+		}
 	},
 ]
 
