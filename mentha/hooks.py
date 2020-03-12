@@ -60,7 +60,9 @@ fixtures = [
 		"filters": {
 			"name": (
 				"in", (
-					"Purchase Summary",
+					"Purchase Invoice Summary",
+					"Purchase Order Summary",
+					"Purchase Receipt Summary",
 				)
 			)
 		}
