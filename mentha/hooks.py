@@ -29,6 +29,7 @@ app_license = "MIT"
 doctype_js = {
 	"Purchase Receipt" : "public/js/purchase_receipt.js",
 	"Purchase Order" : "public/js/purchase_order.js",
+	"Sales Order" : "public/js/sales_order.js",
 	"Purchase Invoice" : "public/js/purchase_invoice.js",
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
@@ -49,6 +50,8 @@ fixtures = [
 					"Purchase Order-qty_billed",
 					"Purchase Order-per_qty_billed",
 					"Purchase Order-order_type",
+					"Delivery Note-per_qty_billed",
+					"Delivery Note Item-billed_qty",
 				)
 			)
 		}
@@ -116,6 +119,13 @@ doc_events = {
 	"Purchase Invoice": {
 		"on_submit": "mentha.hook.purchase_invoice.on_submit",
 		"on_cancel": "mentha.hook.purchase_invoice.on_cancel",
+	},
+	"Sales Order": {
+		"validate": "mentha.hook.sales_order.validate",
+	},
+	"Sales Invoice": {
+		"on_submit": "mentha.hook.sales_invoice.on_submit",
+		"on_cancel": "mentha.hook.sales_invoice.on_cancel",
 	}
 }
 
