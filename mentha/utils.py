@@ -39,3 +39,105 @@ def get_last_purchase_rate(item_code):
 	price = filter(lambda x, item_code=item_code: x.item_code == item_code, rate_map)  
 
 	return price[0].base_rate if price else 0.00
+def update_po_billed_qty():
+	frappe.db.sql("""
+		UPDATE
+			`tabPurchase Order Item`
+		JOIN
+			`tabPurchase Order`
+		ON
+			`tabPurchase Order`.name = `tabPurchase Order Item`.parent
+		SET 
+			`tabPurchase Order Item`.billed_qty = `tabPurchase Order Item`.received_qty
+		WHERE
+			`tabPurchase Order`.status in ('Completed', 'Closed')
+	""")
+
+	print("Purchase Order Item Updated")
+	
+	frappe.db.sql("""
+		CREATE VIEW `viewPO_summary`as SELECT
+			`tabPurchase Order`.name,
+			`tabPurchase Order`.total_qty,
+			SUM(`tabPurchase Order Item`.billed_qty) billed_qty
+		FROM
+			`tabPurchase Order Item`
+		JOIN
+			`tabPurchase Order`
+		ON
+			`tabPurchase Order`.name = `tabPurchase Order Item`.parent
+		WHERE
+			`tabPurchase Order`.status in ('Completed', 'Closed')
+		GROUP BY
+			`tabPurchase Order`.name
+	""")
+
+	print("View viewPO_summary Created")
+
+	frappe.db.sql("""
+		UPDATE
+			`tabPurchase Order`
+		JOIN
+			`viewPO_summary`
+		ON
+			`tabPurchase Order`.name = `viewPO_summary`.name
+		SET 
+			`tabPurchase Order`.qty_billed = `viewPO_summary`.billed_qty,
+			`tabPurchase Order`.per_qty_billed = (`viewPO_summary`.billed_qty / `tabPurchase Order`.total_qty) * 100
+	""")
+	print("Purchase Order Updated")
+
+	frappe.db.sql("""DROP VIEW `viewPO_summary`""")
+
+	print("View viewPO_summary Created")
+	
+def update_dn_billed_qty():
+	frappe.db.sql("""
+		UPDATE
+			`tabDelivery Note Item`
+		JOIN
+			`tabDelivery Note`
+		ON
+			`tabDelivery Note`.name = `tabDelivery Note Item`.parent
+		SET 
+			`tabDelivery Note Item`.billed_qty = `tabDelivery Note Item`.stock_qty
+		WHERE
+			`tabDelivery Note`.status in ('Completed', 'Closed')
+	""")
+	print("Delivery note Item updated successfully")
+
+	frappe.db.sql("""
+		CREATE VIEW `viewDN_summary`as SELECT
+			`tabDelivery Note`.name,
+			`tabDelivery Note`.total_qty,
+			SUM(`tabDelivery Note Item`.billed_qty) billed_qty
+		FROM
+			`tabDelivery Note Item`
+		JOIN
+			`tabDelivery Note`
+		ON
+			`tabDelivery Note`.name = `tabDelivery Note Item`.parent
+		WHERE
+			`tabDelivery Note`.status in ('Completed', 'Closed')
+		GROUP BY
+			`tabDelivery Note`.name
+	""")
+
+	print("view created successfully")
+
+	frappe.db.sql("""
+		UPDATE
+			`tabDelivery Note`
+		JOIN
+			`viewDN_summary`
+		ON
+			`tabDelivery Note`.name = `viewDN_summary`.name
+		SET 
+			`tabDelivery Note`.per_qty_billed = (`viewDN_summary`.billed_qty / `tabDelivery Note`.total_qty) * 100
+	""")
+	print("Delivery Notes Updated!")
+
+	frappe.db.sql("""
+		DROP VIEW `viewDN_summary`
+	""")
+	print("View Dropped")
