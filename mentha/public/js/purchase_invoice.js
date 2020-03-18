@@ -12,6 +12,8 @@ frappe.ui.form.on("Purchase Invoice", {
 			
 	},
 	onload_post_render: frm => {
+		if(!frm.doc.is_new())
+			return
 		frm.trigger("check_order_type");
 	},
 	check_order_type: frm => {
